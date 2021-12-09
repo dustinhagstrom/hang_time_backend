@@ -5,7 +5,7 @@ const {
   getStrikes,
   newStrike,
   resetStrikes,
-} = require("./controller/wordController");
+} = require("./controller/strikesController");
 
 router.get("/", getStrikes);
 router.put("/new", newStrike);

@@ -1,7 +1,7 @@
-const signupUser = async () => {};
-const loginUser = async () => {};
-const deleteUser = async () => {};
-const editUserInfo = async () => {};
+const signupUser = async (req, res) => {};
+const loginUser = async (req, res) => {};
+const deleteUser = async (req, res) => {};
+const editUserInfo = async (req, res) => {};
 
 module.exports = {
   signupUser,

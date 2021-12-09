@@ -1,7 +1,7 @@
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 
-const Player = require("../../player/model/Player");
+const User = require("../../user/model/User");
 
 const keys = process.env.PRIVATE_JWT_KEY;
 
@@ -13,21 +13,21 @@ jwtOptions.secretOrKey = keys; //can be buffer or string
 
 //jwt auth strategy constructed by:
 // new JwtStrategy(options, verify);
-const playerJWTLoginStrategy = new JwtStrategy(
+const userJWTLoginStrategy = new JwtStrategy(
   jwtOptions,
   async (payload, done) => {
-    const playerEmail = payload.email;
+    const userEmail = payload.email;
 
     try {
-      if (playerEmail) {
-        const player = await Player.findOne({ email: playerEmail }).select(
+      if (userEmail) {
+        const user = await User.findOne({ email: userEmail }).select(
           "-password"
         );
 
-        if (!player) {
+        if (!user) {
           return done(null, false);
         } else {
-          return done(null, player);
+          return done(null, user);
         }
       } else {
         return done(null, false);
@@ -38,4 +38,4 @@ const playerJWTLoginStrategy = new JwtStrategy(
   }
 );
 
-module.exports = playerJWTLoginStrategy;
+module.exports = userJWTLoginStrategy;
