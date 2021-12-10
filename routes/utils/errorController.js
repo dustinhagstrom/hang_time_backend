@@ -1,12 +1,13 @@
 const ErrorMessageHandlerClass = require("./ErrorMessageHandlerClass");
 
 function dispatchErrorDevelopment(error, req, res) {
+  console.log("inside dispatchErrorDevelopment", error);
   if (req.originalUrl.startsWith("/api")) {
-    return res.status(error.statusCode).json({
+    res.status(error.statusCode).json({
       status: error.status,
       error: error,
       message: error.message,
-      stack: error.stack,
+      stack: error.stack || "wrong user input",
     });
   }
 }
@@ -34,20 +35,25 @@ function handleMongoDBDuplicate(error) {
 
   let errorMessageDuplicateValue = Object.values(error.keyValue)[0];
   let message = `${errorMessageDuplicateKey} - ${errorMessageDuplicateValue} is taken. Please choose another one.`;
-  return new ErrorMessageHandlerClass(message, 400);
+  let newErrorObj = new ErrorMessageHandlerClass(message, 400);
+  return newErrorObj;
 }
 
 module.exports = (err, req, res, next) => {
-  err.statusCode = err.statusCode || 500;
+  err.statusCode = err.statusCode || 500; //gives mongodb status 500. is statusCode undefined
   err.status = err.status || "error";
-  let error = { ...err };
+
+  let error = { ...err }; //spread operator does not copy properties of the original error obj gen from js in this case because "err" obj is a node/mongo err obj.
   error.message = err.message;
+  console.log("errorController: ", error);
+  console.log(Object.keys(error));
 
   if (error.code === 11000 || error.code === 11001) {
     error = handleMongoDBDuplicate(error);
   }
 
   if (process.env.NODE_ENV === "development") {
+    console.log("inside process.env.NODE_ENV: ");
     dispatchErrorDevelopment(error, req, res);
   } else {
     dispatchErrorProduction(error, req, res);

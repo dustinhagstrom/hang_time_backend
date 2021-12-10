@@ -1,7 +1,83 @@
-const signupUser = async (req, res) => {};
-const loginUser = async (req, res) => {};
-const deleteUser = async (req, res) => {};
-const editUserInfo = async (req, res) => {};
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+const User = require("../model/User");
+
+const signupUser = async (req, res, next) => {
+  const { firstName, lastName, username, email, password } = req.body;
+
+  try {
+    let salt = await bcrypt.genSalt(12);
+    let hashedPassword = await bcrypt.hash(password, salt);
+
+    const welcomeUser = new User({
+      firstName,
+      lastName,
+      username,
+      email,
+      password: hashedPassword,
+    });
+
+    await welcomeUser.save();
+    res.json({ message: "user created successfully, please login." });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const loginUser = async (req, res, next) => {
+  const { email, password } = req.body;
+
+  try {
+    let foundUser = await User.findOne({ email });
+
+    if (!foundUser) {
+      throw new Error("Incorrect email or password.");
+    } else {
+      let comparedPassword = await bcrypt.compare(password, foundUser.password);
+
+      if (!comparedPassword) {
+        throw new Error("Incorrect email or password.");
+      } else {
+        let jwtToken = jwt.sign(
+          {
+            email: foundUser.email,
+            username: foundUser.username,
+          },
+          process.env.PRIVATE_JWT_KEY
+        );
+
+        res.cookie("jwt-cookie", jwtToken, {
+          expires: new Date(Date.now() + 3600000),
+          httpOnly: false, //flags cookie to be accessible only by web server
+          secure: false, //marks cookie to be used with https only
+        });
+
+        res.json({
+          message: "Your credentials match our database!",
+          user: {
+            email: foundUser.email,
+            username: foundUser.username,
+          },
+        });
+      }
+    }
+  } catch (e) {
+    next(e);
+  }
+};
+const deleteUser = async (req, res, next) => {
+  try {
+  } catch (e) {
+    next(e);
+  }
+};
+const editUserInfo = async (req, res, next) => {
+  try {
+  } catch (e) {
+    next(e);
+  }
+};
 
 module.exports = {
   signupUser,

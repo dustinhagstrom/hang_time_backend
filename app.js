@@ -36,6 +36,7 @@ app.use("/api/strikes", strikesRouter);
 app.use("/api/word", wordRouter);
 
 // below runs only if there is an error with the request and res cannot close
+app.use(errorController);
 app.all("*", function (req, res, next) {
   next(
     new ErrorMessageHandlerClass(
@@ -44,5 +45,4 @@ app.all("*", function (req, res, next) {
     )
   );
 });
-app.use(errorController);
 module.exports = app;
