@@ -16,6 +16,14 @@ const wordSchema = new mongoose.Schema({
   gameID: {
     type: String,
   },
+  playerOne: {
+    type: mongoose.ObjectId,
+    ref: "User",
+  },
+  playerTwo: {
+    type: mongoose.ObjectId,
+    ref: "User",
+  },
 });
 
 module.exports = mongoose.model("Word", wordSchema);
