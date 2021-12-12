@@ -4,12 +4,12 @@ const cors = require("cors");
 const passport = require("passport");
 const logger = require("morgan");
 
-const ErrorMessageHandlerClass = require("./routes/utils/ErrorMessageHandlerClass");
-const errorController = require("./routes/utils/errorController");
+const ErrorMessageHandlerClass = require("./routes/utils/error/ErrorMessageHandlerClass");
+const errorController = require("./routes/utils/error/errorController");
 const usersRouter = require("./routes/user/userRouter");
 const strikesRouter = require("./routes/strikes/strikesRouter");
 const wordRouter = require("./routes/word/wordRouter");
-const userPassportStrategy = require("./routes/utils/passport/UserPassport");
+const userPassportStrategy = require("./routes/utils/UserPassport");
 
 const app = express();
 

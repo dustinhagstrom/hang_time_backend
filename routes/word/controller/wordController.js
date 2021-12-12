@@ -1,15 +1,11 @@
-const Pusher = require("pusher");
-
-const pusher = new Pusher({
-  appId: process.env.PUSHER_APP_ID,
-  key: process.env.PUSHER_KEY,
-  secret: process.env.PUSHER_SECRET,
-  cluster: "us2",
-  useTLS: true,
-});
-
 const Word = require("../model/Word");
 const User = require("../../user/model/User");
+
+const {
+  pusherAddPlayerTwo,
+  pusherAddCorrectLetters,
+  pusherAddIncorrectLetters,
+} = require("../../utils/pusher");
 
 const newWord = async (req, res, next) => {
   const { word, emptyLetters, userEmail } = req.body;
@@ -58,29 +54,12 @@ const newWord = async (req, res, next) => {
   }
 };
 
-const pusherWord = async (req, res, next) => {
-  const { sessionID } = req.body;
-  const { playerTwo } = res.locals;
-  console.log(playerTwo);
-  console.log(sessionID);
-
-  try {
-    pusher.trigger(sessionID, "hangEvent", {
-      payload: playerTwo,
-    });
-  } catch (e) {
-    next(e);
-  }
-};
-
 const addPlayerTwoDataToWord = async (req, res, next) => {
-  const { email, sessionID } = req.body;
-  console.log("email: ", email);
-  console.log("sessionID: ", sessionID);
+  const { email, gameID } = req.body;
 
   try {
     let foundPlayerTwo = await User.findOne({ email: email });
-    let foundWord = await Word.findOne({ gameID: sessionID });
+    let foundWord = await Word.findOne({ gameID });
     let foundPlayerOne = await User.findOne({
       _id: foundWord.playerOne,
     }).select("-__v -_id -password -firstName -lastName");
@@ -92,7 +71,7 @@ const addPlayerTwoDataToWord = async (req, res, next) => {
 
     foundWord.playerTwo = foundPlayerTwo._id;
     await foundWord.save(() => {
-      pusherWord(req, res, next);
+      pusherAddPlayerTwo(req, res, next);
     });
 
     res.json({
@@ -113,7 +92,43 @@ const addPlayerTwoDataToWord = async (req, res, next) => {
   }
 };
 
+const addCorrectLettersToWord = async (req, res, next) => {
+  const { correctLetters, emptyLetters, gameID } = req.body;
+  try {
+    let foundWord = await Word.findOne({ gameID });
+
+    foundWord.correctLetters.push(correctLetters);
+    foundWord.emptyLetters = emptyLetters;
+
+    await foundWord.save(() => {
+      pusherAddCorrectLetters(req, res, next);
+    });
+    res.json({ message: "updates saved." });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const addIncorrectLettersToWord = async (req, res, next) => {
+  const { incorrectLetters, gameID } = req.body;
+
+  try {
+    let foundWord = await Word.findOne({ gameID });
+
+    foundWord.incorrectLetters.push(incorrectLetters);
+
+    await foundWord.save(() => {
+      pusherAddIncorrectLetters(req, res, next);
+    });
+    res.json({ message: "updates saved." });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   newWord,
   addPlayerTwoDataToWord,
+  addCorrectLettersToWord,
+  addIncorrectLettersToWord,
 };
