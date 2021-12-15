@@ -65,7 +65,7 @@ const pusherGameOver = async (req, res, next) => {
   const { wordBank } = res.locals;
   try {
     pusher.trigger(gameID, "gameOverNewWordEvent", {
-      payload: { wordBank },
+      payload: wordBank,
     });
   } catch (e) {
     next(e);

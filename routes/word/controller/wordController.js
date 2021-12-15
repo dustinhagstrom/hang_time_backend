@@ -166,7 +166,14 @@ const addIncorrectLettersToWord = async (req, res, next) => {
 
 const editWordOnGameOver = async (req, res, next) => {
   const { word, emptyLetters, gameID } = req.body;
-
+  console.log(
+    "word :",
+    word,
+    "emptyLetters :",
+    emptyLetters,
+    "gameID :",
+    gameID
+  );
   try {
     let foundWord = await Word.findOne({ gameID });
 
