@@ -22,11 +22,12 @@ const pusherAddPlayerTwo = async (req, res, next) => {
 };
 
 const pusherAddCorrectLetters = async (req, res, next) => {
-  const { correctLetters, emptyLetters, gameID } = req.body;
-
+  const { gameID } = req.body;
+  const { newWord } = res.locals;
+  console.log("pusherAddCorrect: ", newWord);
   try {
     pusher.trigger(gameID, "correctLetterEvent", {
-      payload: { correctLetters, emptyLetters },
+      payload: newWord,
     });
   } catch (e) {
     next(e);
@@ -34,11 +35,37 @@ const pusherAddCorrectLetters = async (req, res, next) => {
 };
 
 const pusherAddIncorrectLetters = async (req, res, next) => {
-  const { incorrectLetters, gameID } = req.body;
+  const { gameID } = req.body;
+  const { wordBank } = res.locals;
+  console.log(wordBank);
 
   try {
     pusher.trigger(gameID, "incorrectLetterEvent", {
-      payload: { incorrectLetters },
+      payload: wordBank,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const pusherAddStrikes = async (req, res, next) => {
+  const { strikes, gameID } = req.body;
+
+  try {
+    pusher.trigger(gameID, "incorrectLetterEvent", {
+      payload: { strikes },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const pusherGameOver = async (req, res, next) => {
+  const { gameID } = req.body;
+  const { wordBank } = res.locals;
+  try {
+    pusher.trigger(gameID, "gameOverNewWordEvent", {
+      payload: { wordBank },
     });
   } catch (e) {
     next(e);
@@ -49,4 +76,6 @@ module.exports = {
   pusherAddPlayerTwo,
   pusherAddCorrectLetters,
   pusherAddIncorrectLetters,
+  pusherAddStrikes,
+  pusherGameOver,
 };

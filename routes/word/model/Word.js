@@ -16,6 +16,9 @@ const wordSchema = new mongoose.Schema({
   gameID: {
     type: String,
   },
+  strikes: {
+    type: Number,
+  },
   playerOne: {
     type: mongoose.ObjectId,
     ref: "User",
