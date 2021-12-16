@@ -3,9 +3,8 @@ const User = require("../../user/model/User");
 
 const {
   pusherAddPlayerTwo,
-  pusherAddCorrectLetters,
-  pusherAddIncorrectLetters,
   pusherGameOver,
+  pusherPlayerTwoGuess,
 } = require("../../utils/pusher");
 
 const newWord = async (req, res, next) => {
@@ -96,59 +95,26 @@ const addPlayerTwoDataToWord = async (req, res, next) => {
   }
 };
 
-const addCorrectLettersToWord = async (req, res, next) => {
-  const { correctLetters, emptyLetters, gameID } = req.body;
+const updateWordOnPlayerTwoGuess = async (req, res, next) => {
+  console.log(req.body);
+  let newWordBank = req.body;
+  const { gameID, emptyLetters, correctLetters, incorrectLetters, strikes } =
+    newWordBank;
   try {
     let foundWord = await Word.findOne({ gameID });
 
-    // foundWord.correctLetters = correctLetters;
     foundWord.emptyLetters = emptyLetters;
-    let correctArray = foundWord.correctLetters;
-    correctArray.push(correctLetters);
-    foundWord.correctLetters = correctArray;
-
-    let newWord = {
-      word: foundWord.word,
-      emptyLetters: foundWord.emptyLetters,
-      correctLetters: foundWord.correctLetters,
-      incorrectLetters: foundWord.incorrectLetters,
-      gameID: foundWord.gameID,
-      strikes: foundWord.strikes,
-      playerOne: foundWord.playerOne,
-      playerTwo: foundWord.playerTwo,
-    };
-
-    res.locals.newWord = newWord;
-
-    await foundWord.save(() => {
-      pusherAddCorrectLetters(req, res, next);
-    });
-    res.json({
-      wordBank: newWord,
-    });
-  } catch (e) {
-    next(e);
-  }
-};
-
-const addIncorrectLettersToWord = async (req, res, next) => {
-  const { incorrectLetters, gameID, strikes } = req.body;
-  console.log("line 133: ", incorrectLetters, gameID, strikes);
-  try {
-    let foundWord = await Word.findOne({ gameID });
+    foundWord.correctLetters = correctLetters;
+    foundWord.incorrectLetters = incorrectLetters;
     foundWord.strikes = strikes;
-    // foundWord.incorrectLetters = incorrectLetters;
-    let incorrectArray = foundWord.incorrectLetters;
-    incorrectArray.push(incorrectLetters);
-    foundWord.incorrectLetters = incorrectArray;
 
     let wordBank = {
       word: foundWord.word,
-      emptyLetters: foundWord.emptyLetters,
-      correctLetters: foundWord.correctLetters,
-      incorrectLetters: foundWord.incorrectLetters,
-      gameID: foundWord.gameID,
-      strikes: foundWord.strikes,
+      emptyLetters,
+      correctLetters,
+      incorrectLetters,
+      gameID,
+      strikes,
       playerOne: foundWord.playerOne,
       playerTwo: foundWord.playerTwo,
     };
@@ -156,48 +122,41 @@ const addIncorrectLettersToWord = async (req, res, next) => {
     res.locals.wordBank = wordBank;
 
     await foundWord.save(() => {
-      pusherAddIncorrectLetters(req, res, next);
+      pusherPlayerTwoGuess(req, res, next);
     });
-    res.json({ wordBank });
+    res.json({
+      message: "p2 guesses updated",
+      wordBank,
+    });
   } catch (e) {
     next(e);
   }
 };
 
 const editWordOnGameOver = async (req, res, next) => {
-  const { word, emptyLetters, gameID } = req.body;
-  console.log(
-    "word :",
-    word,
-    "emptyLetters :",
-    emptyLetters,
-    "gameID :",
-    gameID
-  );
+  const { newWordBank } = req.body;
+  const { emptyLetters, word, gameID } = newWordBank;
+  console.log("newWordBank :", newWordBank);
+  console.log("req.body :", req.body);
   try {
-    let foundWord = await Word.findOne({ gameID });
+    let wordBank = await Word.findOne({ gameID });
 
-    foundWord.emptyLetters = emptyLetters;
-    foundWord.word = word;
-    foundWord.correctLetters = [];
-    foundWord.incorrectLetters = [];
-    foundWord.strikes = 0;
-    console.log(foundWord);
+    wordBank.emptyLetters = emptyLetters;
+    wordBank.word = word;
+    wordBank.correctLetters = [];
+    wordBank.incorrectLetters = [];
+    wordBank.strikes = 0;
+    console.log(wordBank);
 
-    const wordBank = {
-      word,
-      emptyLetters,
-      correctLetters: [],
-      incorrectLetters: [],
-      gameID,
-      strikes: 0,
-    };
-    res.locals.wordBank = wordBank;
+    res.locals = { wordBank, gameID };
 
-    await foundWord.save(() => {
+    await wordBank.save(() => {
       pusherGameOver(req, res, next);
     });
-    res.json({ message: "new game.", payload: wordBank });
+    res.json({
+      message: "new game.",
+      payload: wordBank,
+    });
   } catch (e) {
     next(e);
   }
@@ -206,7 +165,6 @@ const editWordOnGameOver = async (req, res, next) => {
 module.exports = {
   newWord,
   addPlayerTwoDataToWord,
-  addCorrectLettersToWord,
-  addIncorrectLettersToWord,
+  updateWordOnPlayerTwoGuess,
   editWordOnGameOver,
 };

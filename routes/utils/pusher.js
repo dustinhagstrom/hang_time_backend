@@ -21,48 +21,47 @@ const pusherAddPlayerTwo = async (req, res, next) => {
   }
 };
 
-const pusherAddCorrectLetters = async (req, res, next) => {
-  const { gameID } = req.body;
-  const { newWord } = res.locals;
-  console.log("pusherAddCorrect: ", newWord);
-  try {
-    pusher.trigger(gameID, "correctLetterEvent", {
-      payload: newWord,
-    });
-  } catch (e) {
-    next(e);
-  }
-};
+// const pusherAddCorrectLetters = async (req, res, next) => {
+//   const { gameID } = req.body;
+//   const { newWord } = res.locals;
+//   console.log("pusherAddCorrect: ", newWord);
+//   try {
+//     pusher.trigger(gameID, "correctLetterEvent", {
+//       payload: newWord,
+//     });
+//   } catch (e) {
+//     next(e);
+//   }
+// };
 
-const pusherAddIncorrectLetters = async (req, res, next) => {
+const pusherPlayerTwoGuess = async (req, res, next) => {
   const { gameID } = req.body;
   const { wordBank } = res.locals;
-  console.log(wordBank);
 
   try {
-    pusher.trigger(gameID, "incorrectLetterEvent", {
+    pusher.trigger(gameID, "P2GuessEvent", {
       payload: wordBank,
     });
   } catch (e) {
     next(e);
   }
 };
+// const pusherAddIncorrectLetters = async (req, res, next) => {
+//   const { gameID } = req.body;
+//   const { wordBank } = res.locals;
+//   console.log(wordBank);
 
-const pusherAddStrikes = async (req, res, next) => {
-  const { strikes, gameID } = req.body;
-
-  try {
-    pusher.trigger(gameID, "incorrectLetterEvent", {
-      payload: { strikes },
-    });
-  } catch (e) {
-    next(e);
-  }
-};
+//   try {
+//     pusher.trigger(gameID, "incorrectLetterEvent", {
+//       payload: wordBank,
+//     });
+//   } catch (e) {
+//     next(e);
+//   }
+// };
 
 const pusherGameOver = async (req, res, next) => {
-  const { gameID } = req.body;
-  const { wordBank } = res.locals;
+  const { wordBank, gameID } = res.locals;
   try {
     pusher.trigger(gameID, "gameOverNewWordEvent", {
       payload: wordBank,
@@ -74,8 +73,6 @@ const pusherGameOver = async (req, res, next) => {
 
 module.exports = {
   pusherAddPlayerTwo,
-  pusherAddCorrectLetters,
-  pusherAddIncorrectLetters,
-  pusherAddStrikes,
+  pusherPlayerTwoGuess,
   pusherGameOver,
 };
