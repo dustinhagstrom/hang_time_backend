@@ -54,7 +54,7 @@ const loginUser = async (req, res, next) => {
         });
 
         res.json({
-          message: "Your credentials match our database!",
+          message: "Login Successful",
           user: {
             email: foundUser.email,
             username: foundUser.username,
