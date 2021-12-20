@@ -5,6 +5,7 @@ const {
   pusherAddPlayerTwo,
   pusherGameOver,
   pusherPlayerTwoGuess,
+  pusherEndSession,
 } = require("../../utils/pusher");
 
 const newWord = async (req, res, next) => {
@@ -134,9 +135,7 @@ const updateWordOnPlayerTwoGuess = async (req, res, next) => {
 };
 
 const editWordOnGameOver = async (req, res, next) => {
-  const { newWordBank } = req.body;
-  const { emptyLetters, word, gameID } = newWordBank;
-  console.log("newWordBank :", newWordBank);
+  const { emptyLetters, word, gameID } = req.body;
   console.log("req.body :", req.body);
   try {
     let wordBank = await Word.findOne({ gameID });
@@ -162,9 +161,24 @@ const editWordOnGameOver = async (req, res, next) => {
   }
 };
 
+const deleteWordOnGameOver = async (req, res, next) => {
+  console.log(req.body);
+  const { gameID } = req.body;
+  try {
+    await Word.findOneAndDelete({ gameID });
+
+    pusherEndSession(req, res, next);
+
+    res.json({ message: "word deleted." });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   newWord,
   addPlayerTwoDataToWord,
   updateWordOnPlayerTwoGuess,
   editWordOnGameOver,
+  deleteWordOnGameOver,
 };
