@@ -59,10 +59,12 @@ const newWord = async (req, res, next) => {
 
 const addPlayerTwoDataToWord = async (req, res, next) => {
   const { email, gameID } = req.body;
+  console.log(gameID);
+  const gameIDUpperCase = gameID.toUpperCase();
 
   try {
     let foundPlayerTwo = await User.findOne({ email: email });
-    let foundWord = await Word.findOne({ gameID });
+    let foundWord = await Word.findOne({ gameID: gameIDUpperCase });
     let foundPlayerOne = await User.findById({
       _id: foundWord.playerOne,
     }).select("-__v -_id -password -firstName -lastName");
@@ -71,6 +73,8 @@ const addPlayerTwoDataToWord = async (req, res, next) => {
       email: foundPlayerTwo.email,
       username: foundPlayerTwo.username,
     };
+
+    res.locals.gameID = gameIDUpperCase;
 
     foundWord.playerTwo = foundPlayerTwo._id;
     await foundWord.save(() => {

@@ -9,8 +9,8 @@ const pusher = new Pusher({
 });
 
 const pusherAddPlayerTwo = async (req, res, next) => {
-  const { gameID } = req.body;
-  const { playerTwo } = res.locals;
+  // const { gameID } = req.body;
+  const { playerTwo, gameID } = res.locals;
 
   try {
     pusher.trigger(gameID, "P2joinEvent", {
