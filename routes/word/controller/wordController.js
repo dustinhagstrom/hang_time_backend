@@ -63,7 +63,7 @@ const addPlayerTwoDataToWord = async (req, res, next) => {
   try {
     let foundPlayerTwo = await User.findOne({ email: email });
     let foundWord = await Word.findOne({ gameID });
-    let foundPlayerOne = await User.findOne({
+    let foundPlayerOne = await User.findById({
       _id: foundWord.playerOne,
     }).select("-__v -_id -password -firstName -lastName");
 
