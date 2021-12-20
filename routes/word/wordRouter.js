@@ -15,7 +15,7 @@ const checkIsUndefined = require("../user/helpers/checkIsUndefined");
 
 const checkIsAlphaFunc = (req, res, next) => {
   const wordBank = req.body;
-  console.log("inside middleware :", wordBank);
+  // console.log("inside middleware :", wordBank);
   for (inputField in wordBank) {
     if (inputField === "word") {
       if (!checkIsAlpha(wordBank[inputField])) {

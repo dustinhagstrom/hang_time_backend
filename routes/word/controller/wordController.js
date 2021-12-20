@@ -13,7 +13,7 @@ const newWord = async (req, res, next) => {
   try {
     let foundUser = await User.findOne({ email: userEmail });
 
-    console.log(foundUser._id);
+    // console.log(foundUser._id);
 
     const generateRandomGameID = () => {
       const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -59,7 +59,7 @@ const newWord = async (req, res, next) => {
 
 const addPlayerTwoDataToWord = async (req, res, next) => {
   const { email, gameID } = req.body;
-  console.log(gameID);
+  // console.log(gameID);
   const gameIDUpperCase = gameID.toUpperCase();
 
   try {
@@ -101,7 +101,7 @@ const addPlayerTwoDataToWord = async (req, res, next) => {
 };
 
 const updateWordOnPlayerTwoGuess = async (req, res, next) => {
-  console.log(req.body);
+  // console.log(req.body);
   let newWordBank = req.body;
   const { gameID, emptyLetters, correctLetters, incorrectLetters, strikes } =
     newWordBank;
@@ -140,7 +140,7 @@ const updateWordOnPlayerTwoGuess = async (req, res, next) => {
 
 const editWordOnGameOver = async (req, res, next) => {
   const { emptyLetters, word, gameID } = req.body;
-  console.log("req.body :", req.body);
+  // console.log("req.body :", req.body);
   try {
     let wordBank = await Word.findOne({ gameID });
 
@@ -149,7 +149,7 @@ const editWordOnGameOver = async (req, res, next) => {
     wordBank.correctLetters = [];
     wordBank.incorrectLetters = [];
     wordBank.strikes = 0;
-    console.log(wordBank);
+    // console.log(wordBank);
 
     res.locals = { wordBank, gameID };
 
@@ -166,7 +166,7 @@ const editWordOnGameOver = async (req, res, next) => {
 };
 
 const deleteWordOnGameOver = async (req, res, next) => {
-  console.log(req.body);
+  // console.log(req.body);
   const { gameID } = req.body;
   try {
     await Word.findOneAndDelete({ gameID });

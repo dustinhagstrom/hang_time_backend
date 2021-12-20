@@ -1,7 +1,7 @@
 const ErrorMessageHandlerClass = require("./ErrorMessageHandlerClass");
 
 function dispatchErrorDevelopment(error, req, res) {
-  console.log("inside dispatchErrorDevelopment", error);
+  // console.log("inside dispatchErrorDevelopment", error);
   if (req.originalUrl.startsWith("/api")) {
     res.status(error.statusCode).json({
       status: error.status,
@@ -45,15 +45,15 @@ module.exports = (err, req, res, next) => {
 
   let error = { ...err }; //spread operator does not copy properties of the original error obj gen from js in this case because "err" obj is a node/mongo err obj.
   error.message = err.message;
-  console.log("errorController: ", error);
-  console.log(Object.keys(error));
+  // console.log("errorController: ", error);
+  // console.log(Object.keys(error));
 
   if (error.code === 11000 || error.code === 11001) {
     error = handleMongoDBDuplicate(error);
   }
 
   if (process.env.NODE_ENV === "development") {
-    console.log("inside process.env.NODE_ENV: ");
+    // console.log("inside process.env.NODE_ENV: ");
     dispatchErrorDevelopment(error, req, res);
   } else {
     dispatchErrorProduction(error, req, res);
