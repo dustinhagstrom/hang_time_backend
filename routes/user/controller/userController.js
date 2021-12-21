@@ -5,6 +5,7 @@ const User = require("../model/User");
 
 const signupUser = async (req, res, next) => {
   const { firstName, lastName, username, email, password } = req.body;
+  let emailLC = email.toLowerCase();
 
   try {
     let salt = await bcrypt.genSalt(12);
@@ -14,7 +15,7 @@ const signupUser = async (req, res, next) => {
       firstName,
       lastName,
       username,
-      email,
+      email: emailLC,
       password: hashedPassword,
     });
 
@@ -27,9 +28,10 @@ const signupUser = async (req, res, next) => {
 
 const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
+  let emailLC = email.toLowerCase();
 
   try {
-    let foundUser = await User.findOne({ email });
+    let foundUser = await User.findOne({ email: emailLC });
 
     if (!foundUser) {
       throw new Error("Incorrect email or password.");
